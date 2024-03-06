@@ -24,6 +24,10 @@ public class DeskPanel extends JPanel {
             JButton deskButton = new JButton("Desk " + deskNumber);
             this.deskPanel.add(deskButton);
         }
+        JButton addingButton = new JButton("+"); // ปุ่มเพิ่ม
+        JButton deletingButton = new JButton("-"); // ปุ่มลด
+        this.deskPanel.add(addingButton);
+        this.deskPanel.add(deletingButton);
 
         this.add(this.deskPanel);
     }
@@ -34,38 +38,67 @@ public class DeskPanel extends JPanel {
         String user = "root";
         String password = "1234";
 
-        // SQL query to retrieve desk numbers
-        String sql = "SELECT SeatID FROM SeatManager";
+        // SQL queries to retrieve desk numbers
+        String config_check = "SELECT ConfigSeatID FROM SeatManager";
+        String seat_check = "SELECT SeatID FROM SeatManager";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
-             Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+             Statement statement = conn.createStatement()) {
 
-            int counter = 0;
-            while (resultSet.next()) {
-                int seatID = resultSet.getInt("SeatID");
-                deskNumbers.add(seatID);
-                counter++;
+            // Execute the query to check the ConfigSeatID
+            try (ResultSet resultSet_config = statement.executeQuery(config_check)) {
+                boolean isFirstValueZero = true;
 
-
-                // Check if the value of SeatID is not null
-                if (!resultSet.wasNull()) {
-                    String updateSql = "UPDATE SeatManager SET ConfigSeatID = ? WHERE SeatID = ?";
-                    try (PreparedStatement updateStatement = conn.prepareStatement(updateSql)) {
-                        updateStatement.setInt(1, seatID);
-                        updateStatement.setInt(2, seatID);
-                        updateStatement.executeUpdate();
+                if (resultSet_config.next()) {
+                    int firstConfigSeatID = resultSet_config.getInt("ConfigSeatID");
+                    if (firstConfigSeatID != 0) {
+                        isFirstValueZero = false;
                     }
                 }
-                if (counter >= 21) {
-                    break;
+
+                // If the first value of ConfigSeatID is zero, fetch desk numbers from SeatID
+                if (isFirstValueZero) {
+                    try (ResultSet resultSet_seat = statement.executeQuery(seat_check)) {
+                        int counter = 0;
+                        while (resultSet_seat.next() && counter < 19) {
+                            int seatID = resultSet_seat.getInt("SeatID");
+                            deskNumbers.add(seatID);
+
+                            if (!resultSet_seat.wasNull()) {
+                                // Perform update if necessary
+                                String updateSql = "UPDATE SeatManager SET ConfigSeatID = ? WHERE SeatID = ?";
+                                try (PreparedStatement updateStatement = conn.prepareStatement(updateSql)) {
+                                    updateStatement.setInt(1, seatID);
+                                    updateStatement.setInt(2, seatID);
+                                    updateStatement.executeUpdate();
+                                }
+                                counter++;
+                            }
+                        }
+                    }
+                }
+                // If the first value of ConfigSeatID is not zero, use it directly
+                else {
+                    deskNumbers.add(resultSet_config.getInt("ConfigSeatID"));
+                    int zero_check = 0;
+                    while (resultSet_config.next() && zero_check <= 1) {
+                        int configSeatID = resultSet_config.getInt("ConfigSeatID");
+                        if (configSeatID == 0) {
+                            zero_check += 1;
+                            continue;
+                        } else {
+                            zero_check = 0;
+                            deskNumbers.add(configSeatID);
+                        }
+                    }
                 }
             }
-
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -74,3 +107,6 @@ public class DeskPanel extends JPanel {
         });
     }
 }
+
+//DELETE FROM SeatManager WHERE ConfigSeatID = 3
+//INSERT INTO NQueue_db.SeatManager (SeatID) VALUES (3)
