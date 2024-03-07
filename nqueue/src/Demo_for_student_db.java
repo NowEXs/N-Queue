@@ -1,24 +1,27 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.sql.*;
 import java.util.logging.*;
 public class Demo_for_student_db extends javax.swing.JFrame {
 
     Connection con;
+    private int selectedRoom;
     private DeskPanel deskPanel;
+
     public Demo_for_student_db() {
         initComponents();
         createConnection();
         this.setLocationRelativeTo(null);
 
         deskPanel = new DeskPanel();
+        deskPanel.setSelectedRoom(selectedRoom);
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(deskPanel, BorderLayout.CENTER);
         setSize(800, 600);
-
     }
-
     private void createConnection() { // Create connection for
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -28,6 +31,12 @@ public class Demo_for_student_db extends javax.swing.JFrame {
             Logger.getLogger(Demo_for_student_db.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Demo_for_student_db.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public void setSelectedRoom(int selectedRoom) {
+        this.selectedRoom = selectedRoom;
+        if (deskPanel != null) {
+            deskPanel.setSelectedRoom(selectedRoom); // Pass selected room to DeskPanel
         }
     }
 
@@ -156,11 +165,10 @@ public class Demo_for_student_db extends javax.swing.JFrame {
     }
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {
+
     }
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -178,9 +186,8 @@ public class Demo_for_student_db extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Demo_for_student_db.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Demo_for_student_db().setVisible(true);
@@ -200,5 +207,5 @@ public class Demo_for_student_db extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField3;
     private javax.swing.JComboBox<String> lab_combo;
     private javax.swing.JTextField name_txt_f;
-    // End of variables declaration
+
 }
