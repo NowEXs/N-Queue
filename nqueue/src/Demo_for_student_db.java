@@ -16,16 +16,16 @@ public class Demo_for_student_db extends javax.swing.JFrame {
         createConnection();
         this.setLocationRelativeTo(null);
 
-        deskPanel = new DeskPanel();
+        deskPanel = new DeskPanel(this);
         deskPanel.setSelectedRoom(selectedRoom);
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(deskPanel, BorderLayout.CENTER);
-        setSize(800, 600);
+        setSize(850, 600);
     }
     private void createConnection() { // Create connection for
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://192.168.1.112/NQueue_db", "root", "1234");
+            con = DriverManager.getConnection("jdbc:mysql://192.168.1.133/NQueue_db", "root", "1234"); // ip ต้องคอยเปลี่ยนตลอด
             System.out.println("Created connection successfully");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Demo_for_student_db.class.getName()).log(Level.SEVERE, null, ex);
@@ -38,6 +38,13 @@ public class Demo_for_student_db extends javax.swing.JFrame {
         if (deskPanel != null) {
             deskPanel.setSelectedRoom(selectedRoom); // Pass selected room to DeskPanel
         }
+    }
+    public void deskSetter(String desk_num) { // เปลี่ยน text เป็นโต๊ะที่เลือก
+        jTextField3.setText(desk_num);
+    }
+
+    public String deskGetter() { // เปลี่ยน text เป็นโต๊ะที่เลือก
+        return jTextField3.getText();
     }
 
     @SuppressWarnings("unchecked")
@@ -52,8 +59,9 @@ public class Demo_for_student_db extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel(); // StudentID label
         jLabel2 = new javax.swing.JLabel(); // Name label
         jLabel3 = new javax.swing.JLabel(); // lab label
-        jTextField3 = new javax.swing.JTextField(); // ตัวแทน logo
+        jTextField3 = new javax.swing.JTextField(); // ตัวแทน logo และ เลขโต๊ะ
         jPanel1 = new javax.swing.JPanel(); // ใส่ไว้เฉยๆจะได้ดูเหมือนแบ่งช่อง
+        jPanel1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -100,7 +108,7 @@ public class Demo_for_student_db extends javax.swing.JFrame {
                                         .addComponent(jLabel3))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                                        .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                                         .addComponent(lab_combo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(id_txt_f)
                                         .addComponent(name_txt_f)
