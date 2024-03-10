@@ -153,14 +153,24 @@ public class Demo_for_student_db extends javax.swing.JFrame {
         int st_id = Integer.parseInt(id_txt_f.getText());
         String st_name = name_txt_f.getText();
         String lab_name = (String) lab_combo.getSelectedItem();
+        String buttonText = this.deskGetter();
+        String[] parts = buttonText.split(" - ");
+        int deskNumber = Integer.parseInt(parts[1]);
 
-        String stmt = "INSERT INTO Student (StudentID, name, lab_name) VALUES (?, ?, ?)";
+        String insertSql = "INSERT INTO Reservation (SM_SeatID, SM_RoomNumber,StudentID, StudentName, Lab_name) VALUES (?, ?, ?, ?, ?)";
+        String reserveSql = "UPDATE SeatManager SET Reservable = 0 WHERE RoomNumber = ? AND SeatID = ?";
 
-        try (PreparedStatement statement = con.prepareStatement(stmt)) {
-            statement.setInt(1, st_id);
-            statement.setString(2, st_name);
-            statement.setString(3, lab_name);
-            statement.executeUpdate();
+        try (PreparedStatement stdstatement = con.prepareStatement(insertSql);
+            PreparedStatement r_stdstatement = con.prepareStatement(reserveSql)) {
+            stdstatement.setInt(1, deskNumber);
+            stdstatement.setInt(2, selectedRoom);
+            stdstatement.setInt(3, st_id);
+            stdstatement.setString(4, st_name);
+            stdstatement.setString(5, lab_name);
+            r_stdstatement.setInt(1, selectedRoom);
+            r_stdstatement.setInt(2, deskNumber);
+            stdstatement.executeUpdate();
+            r_stdstatement.executeUpdate();
             System.out.println("Data inserted successfully");
 
         } catch (SQLException ex) {
