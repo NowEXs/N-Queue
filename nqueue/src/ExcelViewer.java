@@ -55,38 +55,25 @@ public class ExcelViewer extends JFrame {
             DataFormatter dataFormatter = new DataFormatter();
             model = new DefaultTableModel();
 
-            // Determine the maximum number of rows and columns
-            int maxRows = sheet.getLastRowNum() + 1;
-            int maxColumns = 0;
-            for (int i = 0; i < maxRows; i++) {
-                Row row = sheet.getRow(i);
-                if (row != null) {
-                    maxColumns = Math.max(maxColumns, row.getLastCellNum());
-                }
-            }
-
-            // Populate the model with null values if necessary
-            for (int rowIndex = 0; rowIndex < maxRows; rowIndex++) {
-                Object[] rowData = new Object[maxColumns];
-                Row row = sheet.getRow(rowIndex);
-                if (row != null) {
-                    for (int columnIndex = 0; columnIndex < maxColumns; columnIndex++) {
-                        Cell cell = row.getCell(columnIndex);
-                        rowData[columnIndex] = (cell != null) ? dataFormatter.formatCellValue(cell) : null;
-                    }
-                }
-                model.addRow(rowData);
-            }
-
-            // Set column names
             Row headerRow = sheet.getRow(0);
             if (headerRow != null) {
                 for (Cell cell : headerRow) {
                     model.addColumn(dataFormatter.formatCellValue(cell));
                 }
+
+                for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
+                    if (row != null) {
+                        Object[] rowData = new Object[headerRow.getLastCellNum()];
+                        for (int columnIndex = 0; columnIndex < headerRow.getLastCellNum(); columnIndex++) {
+                            Cell cell = row.getCell(columnIndex);
+                            rowData[columnIndex] = dataFormatter.formatCellValue(cell);
+                        }
+                        model.addRow(rowData);
+                    }
+                }
             }
 
-            // Set the model to the table
             table.setModel(model);
         } catch (IOException e) {
             e.printStackTrace();

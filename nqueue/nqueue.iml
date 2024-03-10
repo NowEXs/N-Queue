@@ -16,5 +16,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="commons-compress-1.26.0-sources" level="project" />
   </component>
 </module>
